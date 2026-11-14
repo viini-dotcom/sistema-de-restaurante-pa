@@ -70,10 +70,8 @@ static inline void trocar_posicao_ingredientes(ingrediente_t * restrict i1, ingr
 
 
 static ingrediente_t * ordernar_ingredientes_nome(ingrediente_t * restrict dest, unsigned length, ordem_t ordem) {
-	for(int i = 0; i < numero_ingredientes; i++) dest[i] = ingredientes[i].ingrediente;
-
-	for(int i = 0; i < numero_ingredientes; i++) {
-		for(int j = i + 1; j < numero_ingredientes; j++) {
+	for(int i = 0; i < length; i++) {
+		for(int j = i + 1; j < length; j++) {
 			int vem_primeiro = compare_ingredients_nome(&dest[j], &dest[i]); //dest[j].nome vem primeiro que dest[i].nome ?
 			if(ordem == CRESCENTE) {
 				if(vem_primeiro == false) continue; //aqui se caso nao, então não é pra troca
@@ -233,6 +231,8 @@ ingrediente_t *checar_ingrediente(const unsigned codigo) {
 }
 
 int __procurar_ingredientes_NOME(ingrediente_t *restrict destino, const char *restrict nome) {
+	estoque_iniciado_checar();
+
 	unsigned dest_idx = 0;
 	for(int i = 0; i < numero_ingredientes; i++) {
 		if(ingredientes[i].ativo == 0) continue;
@@ -243,10 +243,15 @@ int __procurar_ingredientes_NOME(ingrediente_t *restrict destino, const char *re
 		}
 	}
 
+	ordernar_ingredientes_nome(destino, dest_idx, CRESCENTE);
+
+
 	return dest_idx;
 }
 
 int __procurar_ingredientes_CODIGO(ingrediente_t *restrict destino, const unsigned long codigo) {
+	estoque_iniciado_checar();
+
 	unsigned dest_idx = 0;
 	for(int i = 0; i < numero_ingredientes; i++) {
 		if(ingredientes[i].ativo == 0) continue;
@@ -254,6 +259,8 @@ int __procurar_ingredientes_CODIGO(ingrediente_t *restrict destino, const unsign
 		if(numero_comeca_com(ingredientes[i].ingrediente.codigo, codigo))
 			destino[dest_idx++] = ingredientes[i].ingrediente;
 	}
+
+	ordernar_ingredientes_codigo(destino, dest_idx, CRESCENTE);
 
 	return dest_idx;
 }
@@ -264,6 +271,7 @@ estoque_status_t adicionar_ingrediente(const char * restrict nome,
 		const unidade_t unidade_de_medida, 
 		const float quantidade_minima, 
 		const float custo_unitario) {
+	estoque_iniciado_checar();
 
 	ingrediente_t new = {
 		.codigo = codigo,
@@ -281,7 +289,22 @@ estoque_status_t adicionar_ingrediente(const char * restrict nome,
 	return SUCESSO;
 }
 
-estoque_status_t editar_ingrediente(const unsigned codigo, const unsigned secao, secao_t valor) {
+estoque_status_t remover_ingrediente(const unsigned codigo) {
+	estoque_iniciado_checar();
+
+	ingrediente_t *ing = checar_ingrediente(codigo);
+	if(ing == NULL) return INGREDIENTE_INEXISTENTE;
+	if(ing->quantidade != 0) return ESTOQUE_AINDA_DISPONIVEL;
+
+	remover(codigo);
+
+
+	return SUCESSO;
+}
+
+estoque_status_t editar_ingrediente(const unsigned codigo, const secao_t secao, unsigned valor) {
+	estoque_iniciado_checar();
+
 	ingrediente_t *ingrediente = checar_ingrediente(codigo);
 	if(ingrediente == NULL) return INGREDIENTE_INEXISTENTE;
 
@@ -305,16 +328,19 @@ estoque_status_t editar_ingrediente(const unsigned codigo, const unsigned secao,
 }
 
 estoque_status_t estocar_ingrediente(const unsigned int codigo, const unsigned int quantidade) {
+	estoque_iniciado_checar();
+
 	ingrediente_t *ingrediente = NULL;
 	if(!(ingrediente = checar_ingrediente(codigo))) return INGREDIENTE_INEXISTENTE;
 	
 	ingrediente->quantidade += quantidade;
-	printf("%f\n", ingrediente->quantidade);
 
 	return SUCESSO;
 }
 
 estoque_status_t usar_ingrediente(const unsigned int codigo, const unsigned int quantidade) {
+	estoque_iniciado_checar();
+
 	ingrediente_t *ingrediente = NULL;
 	if(!(ingrediente = checar_ingrediente(codigo))) return INGREDIENTE_INEXISTENTE;
 	if(ingrediente->quantidade < quantidade) return ESTOQUE_POUCO;
@@ -324,7 +350,11 @@ estoque_status_t usar_ingrediente(const unsigned int codigo, const unsigned int 
 	return SUCESSO;
 }
 
-int listar_ingrediente_por(ingrediente_t *restrict destino,const unsigned tamanho, tipo_t tipo, ordem_t ordem) {
+int listar_ingrediente(ingrediente_t *restrict destino,const unsigned tamanho, tipo_t tipo, ordem_t ordem) {
+	estoque_iniciado_checar();
+
+	for(int i = 0; i < numero_ingredientes; i++) destino[i] = ingredientes[i].ingrediente;
+
 	switch(tipo) {
 		case NOME:
 			ordernar_ingredientes_nome(destino,  tamanho, ordem);
@@ -336,4 +366,31 @@ int listar_ingrediente_por(ingrediente_t *restrict destino,const unsigned tamanh
 	}
 
 	return 0;
+}
+
+void print_ingrediente(const ingrediente_t *restrict ing) {
+	char unidade_de_medida[128];
+	switch(ing->unidade_de_medida) {
+		case KILOGRAMAS:
+			strcpy(unidade_de_medida, "Kilogramas");
+			break;
+		case LITROS:
+			strcpy(unidade_de_medida, "Litros");
+			break;
+		case MILILITROS:
+			strcpy(unidade_de_medida, "Mililitros");
+			break;
+		case UNIDADE:
+			strcpy(unidade_de_medida, "Unidade");
+			break;
+		default: strcpy(unidade_de_medida, "Nulo"); break;
+	}
+	printf(
+			"Nome: %s\n"
+			"Codigo: %d\n"
+			"Unidade de medida: %s\n"
+			"Quantidade: %.2f\n"
+			"Quantidade minima: %.2f\n"
+			"Custo unitario: %.2f\n"
+		 , ing->nome, ing->codigo, unidade_de_medida, ing->quantidade, ing->quatidade_minima, ing->custo_unitario);
 }

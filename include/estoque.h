@@ -10,7 +10,6 @@ typedef enum {
 typedef const enum {
 	SUCESSO = 0,
 
-
 	CODIGO_EXISTENTE,
 	CODIGO_INEXISTENTE,
 	
@@ -22,6 +21,7 @@ typedef const enum {
 	ESTOQUE_NAO_INICIADO,
 	ESTOQUE_NULO,
 	ESTOQUE_POUCO,
+	ESTOQUE_AINDA_DISPONIVEL,
 
 	SECAO_INVALIDA,
 
@@ -57,22 +57,21 @@ typedef struct {
 estoque_status_t estoque_iniciar();
 void estoque_encerrar();
 
-int __procurar_ingredientes_NOME(ingrediente_t *restrict destino, const char *restrict nome);
-int __procurar_ingredientes_CODIGO(ingrediente_t *restrict destino, const unsigned long codigo);
+int __procurar_ingredientes_NOME(ingrediente_t *restrict destino, const char *restrict nome); //
+int __procurar_ingredientes_CODIGO(ingrediente_t *restrict destino, const unsigned long codigo); //
+#define procurar_ingredientes(dest, value, tipo) __procurar_ingredientes_##tipo(dest, value) //
+int listar_ingrediente(ingrediente_t * restrict destino, const unsigned tamanho ,tipo_t tipo, ordem_t ordem); //
 
-
-#define procurar_ingredientes(dest, value, tipo) \
-	__procurar_ingredientes_##tipo(dest, value)
-
-int listar_ingrediente_por(ingrediente_t * restrict destino,const unsigned tamanho ,tipo_t tipo, ordem_t ordem);
+void print_ingrediente(const ingrediente_t *restrict ing);
 
 ingrediente_t *checar_ingrediente(const unsigned codigo); //
-
 estoque_status_t adicionar_ingrediente(const char * restrict nome,
 		const unsigned codigo, 
 		unidade_t unidade_de_medida, 
 		const float quantidade_minima, 
 		const float custo_unitario); //
+estoque_status_t remover_ingrediente(const unsigned codigo); //
+estoque_status_t editar_ingrediente(const unsigned codigo, const secao_t secao, unsigned valor);
 
 estoque_status_t estocar_ingrediente(const unsigned codigo, const unsigned quantidade); //
 estoque_status_t usar_ingrediente(const unsigned codigo, const unsigned quantidade); //
