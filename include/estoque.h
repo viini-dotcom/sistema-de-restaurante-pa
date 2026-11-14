@@ -1,13 +1,13 @@
 #ifndef ESTOQUE_H
 #define ESTOQUE_H
-typedef enum {
+enum {
 	KILOGRAMAS = 0,
 	LITROS,
 	MILILITROS,
 	UNIDADE,
-} unidade_t;
+};
 
-typedef const enum {
+enum {
 	SUCESSO = 0,
 
 	CODIGO_EXISTENTE,
@@ -26,24 +26,24 @@ typedef const enum {
 	SECAO_INVALIDA,
 	TIPO_INVALIDO,
 	UNIDADE_INVALIDA,
-} estoque_status_t;
+};
 
-typedef const enum {
+enum {
 	UNIDADE_DE_MEDIDA,
 	QUANTIDADE_MINIMA,
 	CUSTO_UNITARIO,
-} secao_t;
+};
 
-typedef const enum {
+enum {
 	CRESCENTE = 0,
 	DECRESCENTE,
-} ordem_t;
+};
 
-typedef const enum {
+enum {
 	NOME,
 	PRECO,
 	CODIGO,
-} tipo_t;
+};
 
 typedef struct {
 	char * name;
@@ -54,32 +54,34 @@ typedef struct {
 typedef struct {
 	unsigned codigo;
 	char nome[64];
-	unidade_t unidade_de_medida;
+	int unidade_de_medida;
 	float quantidade;
 	float quatidade_minima;
 	float custo_unitario;
 } ingrediente_t;
 
-estoque_status_t estoque_iniciar();
-void estoque_encerrar();
-
 int __procurar_ingredientes_NOME(ingrediente_t *restrict destino, const char *restrict nome); //
 int __procurar_ingredientes_CODIGO(ingrediente_t *restrict destino, const unsigned long codigo); //
-#define procurar_ingredientes(dest, value, tipo) __procurar_ingredientes_##tipo(dest, value) //
-int listar_ingrediente(ingrediente_t * restrict destino, const unsigned tamanho ,tipo_t tipo, ordem_t ordem); //
-int listar_ingredientes_faltando(ingrediente_t * restrict destino);
 
-ingrediente_t *checar_ingrediente(const unsigned codigo); //
-estoque_status_t adicionar_ingrediente(const char * restrict nome,
-		const unsigned codigo, 
-		unidade_t unidade_de_medida, 
-		const float quantidade_minima, 
-		const float custo_unitario); //
-estoque_status_t remover_ingrediente(const unsigned codigo); //
-estoque_status_t editar_ingrediente(const unsigned codigo, const secao_t secao,const float valor);
+int estoque_iniciar();
+void estoque_encerrar();
 
-estoque_status_t estocar_ingrediente(const unsigned codigo, const unsigned quantidade); //
-estoque_status_t usar_ingrediente(const unsigned codigo, const unsigned quantidade); //
+#define 			ingredientes_procurar(dest, value, tipo) __procurar_ingredientes_##tipo(dest, value) //
+int ingrediente_listar(ingrediente_t * restrict destino, const unsigned tamanho ,int tipo, int ordem); //
+int ingredientes_listar_faltando(ingrediente_t * restrict destino);
+
+ingrediente_t *ingrediente_checar(const unsigned codigo); //
+int 	ingrediente_adicionar(	const char * restrict nome,
+									const unsigned codigo, 
+									int unidade_de_medida, 
+									const float quantidade_minima, 
+									const float custo_unitario); //
+
+int 	ingrediente_remover(const unsigned codigo); //
+int 	ingrediente_editar(const unsigned codigo, const int secao,const float valor);
+
+int 	ingrediente_estocar(const unsigned codigo, const unsigned quantidade); //
+int 	ingrediente_usar(const unsigned codigo, const unsigned quantidade); //
 
 void gerar_registro(estoque_registro_t *dest);
 

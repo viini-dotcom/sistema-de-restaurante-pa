@@ -101,7 +101,7 @@ static inline void trocar_posicao_ingredientes(ingrediente_t * restrict i1, ingr
 }
 
 
-static ingrediente_t * ordernar_ingredientes_nome(ingrediente_t * restrict dest, unsigned length, ordem_t ordem) {
+static ingrediente_t * ordernar_ingredientes_nome(ingrediente_t * restrict dest, unsigned length, int ordem) {
 	for(int i = 0; i < length; i++) {
 		for(int j = i + 1; j < length; j++) {
 			int vem_primeiro = compare_ingredients_nome(&dest[j], &dest[i]); //dest[j].nome vem primeiro que dest[i].nome ?
@@ -121,7 +121,7 @@ static ingrediente_t * ordernar_ingredientes_nome(ingrediente_t * restrict dest,
 	return dest;
 }
 
-static ingrediente_t * ordernar_ingredientes_codigo(ingrediente_t * restrict dest, unsigned length, ordem_t ordem) {
+static ingrediente_t * ordernar_ingredientes_codigo(ingrediente_t * restrict dest, unsigned length, int ordem) {
 	for(int i = 0; i < numero_ingredientes; i++) {
 		for(int j = i + 1; j < numero_ingredientes; j++) {
 			if(ordem == CRESCENTE && dest[j].codigo > dest[i].codigo) {
@@ -137,7 +137,7 @@ static ingrediente_t * ordernar_ingredientes_codigo(ingrediente_t * restrict des
 	return dest;
 }
 
-static ingrediente_t * ordernar_ingredientes_preco(ingrediente_t * restrict dest, unsigned length, ordem_t ordem) {
+static ingrediente_t * ordernar_ingredientes_preco(ingrediente_t * restrict dest, unsigned length, int ordem) {
 	for(int i = 0; i < length; i++) {
 		for(int j = i + 1; j < length; j++) {
 			if(ordem == CRESCENTE && dest[j].custo_unitario > dest[i].custo_unitario)
@@ -215,7 +215,7 @@ static inline void estoque_iniciado_checar() {
 	if(ingredientes == NULL) panic("Referencia de estoque perdida", ESTOQUE_NULO);
 }
 
-static inline estoque_status_t adicionar(ingrediente_t ingrediente) {
+static inline int adicionar(ingrediente_t ingrediente) {
 	if(existe(ingrediente.codigo)) return CODIGO_EXISTENTE;
 
 	block_t *b = take_free_block();
@@ -236,7 +236,7 @@ static inline estoque_status_t adicionar(ingrediente_t ingrediente) {
 	return SUCESSO;
 }
 
-static inline estoque_status_t remover(const unsigned codigo) {
+static inline int remover(const unsigned codigo) {
 	block_t *bloco = encontrar(codigo);
 	if(bloco == NULL) return INGREDIENTE_INEXISTENTE;
 	free_block(bloco);
@@ -245,7 +245,7 @@ static inline estoque_status_t remover(const unsigned codigo) {
 }
 
 //Função de inicio
-estoque_status_t estoque_iniciar() {
+int estoque_iniciar() {
 	buffer_size = ((numero_ingredientes + 4096) / 4096) * 4096 * sizeof(ingrediente_t);
 
 	ingredientes = malloc(buffer_size);
@@ -259,7 +259,7 @@ void estoque_encerrar() {
 }
 
 //Procura no estoque
-ingrediente_t *checar_ingrediente(const unsigned codigo) {
+ingrediente_t *ingrediente_checar(const unsigned codigo) {
 	estoque_iniciado_checar();
 
 
@@ -306,9 +306,9 @@ int __procurar_ingredientes_CODIGO(ingrediente_t *restrict destino, const unsign
 }
 
 //Controle de estoque
-estoque_status_t adicionar_ingrediente(const char * restrict nome,
+int ingrediente_adicionar(const char * restrict nome,
 		const unsigned codigo, 
-		const unidade_t unidade_de_medida, 
+		const int unidade_de_medida, 
 		const float quantidade_minima, 
 		const float custo_unitario) {
 	estoque_iniciado_checar();
@@ -329,10 +329,10 @@ estoque_status_t adicionar_ingrediente(const char * restrict nome,
 	return SUCESSO;
 }
 
-estoque_status_t remover_ingrediente(const unsigned codigo) {
+int ingrediente_remover(const unsigned codigo) {
 	estoque_iniciado_checar();
 
-	ingrediente_t *ing = checar_ingrediente(codigo);
+	ingrediente_t *ing = ingrediente_checar(codigo);
 	if(ing == NULL) return INGREDIENTE_INEXISTENTE;
 	if(ing->quantidade != 0) return ESTOQUE_AINDA_DISPONIVEL;
 
@@ -342,15 +342,15 @@ estoque_status_t remover_ingrediente(const unsigned codigo) {
 	return SUCESSO;
 }
 
-estoque_status_t editar_ingrediente(const unsigned codigo, const secao_t secao,const float valor) {
+int ingrediente_editar(const unsigned codigo, const int secao,const float valor) {
 	estoque_iniciado_checar();
 
-	ingrediente_t *ingrediente = checar_ingrediente(codigo);
+	ingrediente_t *ingrediente = ingrediente_checar(codigo);
 	if(ingrediente == NULL) return INGREDIENTE_INEXISTENTE;
 
 	switch(secao) {
 		case UNIDADE_DE_MEDIDA:;
-			unsigned valor_em_int = (unidade_t)valor;
+			unsigned valor_em_int = (int)valor;
 			if(valor_em_int > 3 || valor_em_int < 0) return UNIDADE_INVALIDA;
 
 			ingrediente->unidade_de_medida = valor_em_int;
@@ -367,11 +367,11 @@ estoque_status_t editar_ingrediente(const unsigned codigo, const secao_t secao,c
 	return SUCESSO;
 }
 
-estoque_status_t estocar_ingrediente(const unsigned int codigo, const unsigned int quantidade) {
+int ingrediente_estocar(const unsigned int codigo, const unsigned int quantidade) {
 	estoque_iniciado_checar();
 
 	ingrediente_t *ingrediente = NULL;
-	if(!(ingrediente = checar_ingrediente(codigo))) return INGREDIENTE_INEXISTENTE;
+	if(!(ingrediente = ingrediente_checar(codigo))) return INGREDIENTE_INEXISTENTE;
 	
 	ingrediente->quantidade += quantidade;
 	registro_criar(*ingrediente, quantidade);
@@ -379,11 +379,11 @@ estoque_status_t estocar_ingrediente(const unsigned int codigo, const unsigned i
 	return SUCESSO;
 }
 
-estoque_status_t usar_ingrediente(const unsigned int codigo, const unsigned int quantidade) {
+int ingrediente_usar(const unsigned int codigo, const unsigned int quantidade) {
 	estoque_iniciado_checar();
 
 	ingrediente_t *ingrediente = NULL;
-	if(!(ingrediente = checar_ingrediente(codigo))) return INGREDIENTE_INEXISTENTE;
+	if(!(ingrediente = ingrediente_checar(codigo))) return INGREDIENTE_INEXISTENTE;
 	if(ingrediente->quantidade < quantidade) return ESTOQUE_POUCO;
 	
 	ingrediente->quantidade -= quantidade;
@@ -394,7 +394,7 @@ estoque_status_t usar_ingrediente(const unsigned int codigo, const unsigned int 
 
 
 //Listar em ordem os ingredientes
-int listar_ingrediente(ingrediente_t *restrict destino,const unsigned tamanho, tipo_t tipo, ordem_t ordem) {
+int ingrediente_listar(ingrediente_t *restrict destino,const unsigned tamanho, int tipo, int ordem) {
 	estoque_iniciado_checar();
 
 	for(int i = 0; i < numero_ingredientes; i++) destino[i] = ingredientes[i].ingrediente;
@@ -416,7 +416,7 @@ int listar_ingrediente(ingrediente_t *restrict destino,const unsigned tamanho, t
 	return SUCESSO;
 }
 
-int listar_ingredientes_faltando(ingrediente_t *restrict destino) {
+int ingredientes_listar_faltando(ingrediente_t *restrict destino) {
 	estoque_iniciado_checar();
 
 	int dest_idx = 0;
