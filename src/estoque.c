@@ -14,10 +14,10 @@ typedef struct __block_t {
 	struct __block_t * next;
 } block_t;
 
-block_t *freelist = NULL;
-block_t *ingredientes = NULL;
-unsigned numero_ingredientes = 0;
-unsigned buffer_size = 0;
+static block_t *freelist = NULL;
+static block_t *ingredientes = NULL;
+static unsigned numero_ingredientes = 0;
+static unsigned buffer_size = 0;
 
 static int numero_comeca_com(unsigned numero, const unsigned comeco) {
 	while(numero != 0 && numero !=  comeco)
@@ -61,22 +61,33 @@ static ingrediente_t * compare_ingredients_nome(ingrediente_t * restrict i1, ing
 }
 
 
-static ingrediente_t * ordernar_ingredientes_nome(ingrediente_t * restrict dest) {
+static ingrediente_t * ordernar_ingredientes_nome(ingrediente_t * restrict dest, unsigned length, ordem_t ordem) {
 	for(int i = 0; i < numero_ingredientes; i++) dest[i] = ingredientes[i].ingrediente;
 
 	for(int i = 0; i < numero_ingredientes; i++) {
 		for(int j = i + 1; j < numero_ingredientes; j++) {
+			//Retorna quem é maior, ou seja, tmp = dest[i] ou dest[j]
 			ingrediente_t tmp = *compare_ingredients_nome(&dest[i], &dest[j]);
-			if(strcmp(tmp.nome, dest[i].nome) == 0) continue;
-			dest[j] = dest[i];
-			dest[i] = tmp;
+			if(strcmp(tmp.nome, dest[i].nome) == 0 && ordem == CRESCENTE) continue;
+			if(strcmp(tmp.nome, dest[j].nome) == 0 && ordem == DECRESCENTE) continue;
+			
+			if(ordem == CRESCENTE) {
+				//Quanto tmp segura dest[j]
+				dest[j] = dest[i];
+				dest[i] = tmp;
+				continue;
+			}
+
+			//Quando tmp segura dest[i]
+			dest[i] = dest[j];
+			dest[j] = tmp;
 		}
 	}
 
 	return dest;
 }
 
-static ingrediente_t * ordernar_ingredientes_codigo(ingrediente_t * restrict dest) {
+static ingrediente_t * ordernar_ingredientes_codigo(ingrediente_t * restrict dest, unsigned length, ordem_t ordem) {
 	for(int i = 0; i < numero_ingredientes; i++) dest[i] = ingredientes[i].ingrediente;
 
 	for(int i = 0; i < numero_ingredientes; i++) {
@@ -307,13 +318,13 @@ estoque_status_t usar_ingrediente(const unsigned int codigo, const unsigned int 
 	return SUCESSO;
 }
 
-int listar_ingrediente_por(ingrediente_t *restrict destino, tipo_t tipo) {
+int listar_ingrediente_por(ingrediente_t *restrict destino,const unsigned tamanho, tipo_t tipo, ordem_t ordem) {
 	switch(tipo) {
 		case NOME:
-			ordernar_ingredientes_nome(destino);
+			ordernar_ingredientes_nome(destino,  tamanho, ordem);
 			break;
 		case CODIGO:
-			ordernar_ingredientes_codigo(destino);
+			ordernar_ingredientes_codigo(destino, tamanho, ordem);
 			break;
 		default: return -1;
 	}

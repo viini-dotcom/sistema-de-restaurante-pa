@@ -35,6 +35,11 @@ typedef const enum {
 } secao_t;
 
 typedef const enum {
+	CRESCENTE = 0,
+	DECRESCENTE,
+} ordem_t;
+
+typedef const enum {
 	NOME,
 	PRECO,
 	CODIGO,
@@ -59,7 +64,7 @@ int __procurar_ingredientes_CODIGO(ingrediente_t *restrict destino, const unsign
 #define procurar_ingredientes(dest, value, tipo) \
 	__procurar_ingredientes_##tipo(dest, value)
 
-int listar_ingrediente_por(ingrediente_t * restrict destino, tipo_t tipo);
+int listar_ingrediente_por(ingrediente_t * restrict destino,const unsigned tamanho ,tipo_t tipo, ordem_t ordem);
 
 ingrediente_t *checar_ingrediente(const unsigned codigo); //
 
