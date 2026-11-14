@@ -35,7 +35,9 @@ static char * lower_string(char * restrict dest, const char * restrict string) {
 	return dest;
 }
 
-static ingrediente_t * compare_ingredients_nome(ingrediente_t * restrict i1, ingrediente_t * restrict i2) {
+
+//Retorna false se i2 vem primeiro que i1
+static int compare_ingredients_nome(ingrediente_t * restrict i1, ingrediente_t * restrict i2) {
 	unsigned s1len = strlen(i1->nome);
 	unsigned s2len = strlen(i2->nome);
 	unsigned min = (s1len > s2len) ? s2len : s1len;
@@ -45,19 +47,25 @@ static ingrediente_t * compare_ingredients_nome(ingrediente_t * restrict i1, ing
 
 	if(cmp == 0) {
 		if(s1len > s2len)
-			return i2;
-		return i1;
+			return false;
+		return true;
 	}
 
 	for(int i = 0; i < min; i++) {
 		if(i1->nome[i] - i2->nome[i] == 0) continue;
-		if(-(i1->nome[i] - i2->nome[i]) > 0) return i1;
-		return i2;
+		if(-(i1->nome[i] - i2->nome[i]) > 0) return true;
+		return false;
 	}
 
 
 
-	return i1;
+	return true;
+}
+
+static inline void trocar_posicao_ingredientes(ingrediente_t * restrict i1, ingrediente_t * restrict i2) {
+	ingrediente_t tmp = *i1;
+	*i1 = *i2;
+	*i2 = tmp;
 }
 
 
@@ -66,21 +74,17 @@ static ingrediente_t * ordernar_ingredientes_nome(ingrediente_t * restrict dest,
 
 	for(int i = 0; i < numero_ingredientes; i++) {
 		for(int j = i + 1; j < numero_ingredientes; j++) {
-			//Retorna quem é maior, ou seja, tmp = dest[i] ou dest[j]
-			ingrediente_t tmp = *compare_ingredients_nome(&dest[i], &dest[j]);
-			if(strcmp(tmp.nome, dest[i].nome) == 0 && ordem == CRESCENTE) continue;
-			if(strcmp(tmp.nome, dest[j].nome) == 0 && ordem == DECRESCENTE) continue;
-			
+			int vem_primeiro = compare_ingredients_nome(&dest[j], &dest[i]); //dest[j].nome vem primeiro que dest[i].nome ?
 			if(ordem == CRESCENTE) {
-				//Quanto tmp segura dest[j]
-				dest[j] = dest[i];
-				dest[i] = tmp;
+				if(vem_primeiro == false) continue; //aqui se caso nao, então não é pra troca
+				trocar_posicao_ingredientes(&dest[i], &dest[j]);
 				continue;
 			}
-
-			//Quando tmp segura dest[i]
-			dest[i] = dest[j];
-			dest[j] = tmp;
+			if(ordem == DECRESCENTE) {
+				if(vem_primeiro == true) continue; //aqui se caso sim, não é pra trocar
+				trocar_posicao_ingredientes(&dest[i], &dest[j]);
+				continue;
+			}
 		}
 	}
 
@@ -92,10 +96,12 @@ static ingrediente_t * ordernar_ingredientes_codigo(ingrediente_t * restrict des
 
 	for(int i = 0; i < numero_ingredientes; i++) {
 		for(int j = i + 1; j < numero_ingredientes; j++) {
-			if(dest[j].codigo > dest[i].codigo) {
-				ingrediente_t tmp = dest[i];
-				dest[i] = dest[j];
-				dest[j] = tmp;
+			if(ordem == CRESCENTE && dest[j].codigo > dest[i].codigo) {
+				trocar_posicao_ingredientes(&dest[i], &dest[j]);
+			}
+			if(ordem == DECRESCENTE && dest[j].codigo < dest[i].codigo) {
+				trocar_posicao_ingredientes(&dest[i], &dest[j]);
+				continue;
 			}
 		}
 	}
