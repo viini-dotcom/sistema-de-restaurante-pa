@@ -80,8 +80,8 @@ int 	ingrediente_adicionar(	const char * restrict nome,
 int 	ingrediente_remover(const unsigned codigo); //
 int 	ingrediente_editar(const unsigned codigo, const int secao,const float valor);
 
-int 	ingrediente_estocar(const unsigned codigo, const unsigned quantidade); //
-int 	ingrediente_usar(const unsigned codigo, const unsigned quantidade); //
+int 	estoque_adicionar(const unsigned codigo, const unsigned quantidade); //
+int 	estoque_remover(const unsigned codigo, const unsigned quantidade); //
 
 void gerar_registro(estoque_registro_t *dest);
 

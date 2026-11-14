@@ -19,11 +19,56 @@ static inline void panic(const char * restrict message, const unsigned exit_code
 	exit(exit_code);
 }
 
+
+//Controle de memoria
 static block_t *freelist = NULL;
 static block_t *ingredientes = NULL;
-static unsigned numero_ingredientes = 0;
 static unsigned buffer_size = 0;
+static block_t * buffer_top = NULL;
+static unsigned diff = 0;
 
+static inline int block_init() {
+	ingredientes = malloc(buffer_size);
+	if(ingredientes == NULL) return SEM_MEMORIA;
+	buffer_top = ingredientes;
+
+	return 0;
+}
+
+static inline block_t *take_free_block() {
+	if(freelist == NULL) return NULL;
+	block_t *bloco = freelist;
+	freelist = freelist->next;
+	bloco->ativo = 1;
+	return bloco;
+}
+
+static inline void free_block(block_t *b) {
+	if(freelist != NULL) b->next = freelist;
+	b->ativo = 0;
+	freelist = b;
+}
+
+static inline block_t *new_block() {
+	block_t * b = NULL;
+	if((b = take_free_block())) return b;
+
+	if(buffer_size < buffer_top - ingredientes) {
+		void *tmp = realloc(ingredientes, (buffer_size * 2) * sizeof(ingrediente_t));
+		if(tmp == NULL) return NULL;
+
+		ingredientes = tmp;
+		buffer_size *= 2;
+	}
+
+	buffer_top->ativo = 1;
+	buffer_top->next = NULL;
+	diff += 1;
+
+	return buffer_top++;
+}
+
+//Registros de saida e entrada
 static estoque_registro_t *registros = NULL;
 static unsigned log_idx = 0;
 static unsigned log_max_idx = 4096;
@@ -122,8 +167,8 @@ static ingrediente_t * ordernar_ingredientes_nome(ingrediente_t * restrict dest,
 }
 
 static ingrediente_t * ordernar_ingredientes_codigo(ingrediente_t * restrict dest, unsigned length, int ordem) {
-	for(int i = 0; i < numero_ingredientes; i++) {
-		for(int j = i + 1; j < numero_ingredientes; j++) {
+	for(int i = 0; i < diff; i++) {
+		for(int j = i + 1; j < diff; j++) {
 			if(ordem == CRESCENTE && dest[j].codigo > dest[i].codigo) {
 				trocar_posicao_ingredientes(&dest[i], &dest[j]);
 			}
@@ -152,58 +197,16 @@ static ingrediente_t * ordernar_ingredientes_preco(ingrediente_t * restrict dest
 }
 
 
-//buffer
-static inline int buffer_aumentar() {
-	buffer_size = buffer_size * 2;
-
-	void * tmp = 0;
-	tmp = realloc(ingredientes, buffer_size);
-	if(tmp == NULL) {
-		buffer_size /= 2;
-		return false;
-	}
-
-	ingredientes = tmp;
-	return true;
-}
-
-static inline int buffer_diminuir() {
-	buffer_size /= 2;
-
-	void * tmp = 0;
-	tmp = realloc(ingredientes, buffer_size);
-	if(tmp == NULL) { 
-		buffer_size *= 2;
-		return false;
-	}
-
-	ingredientes = tmp;
-	return true;
-}
-
-static inline block_t *take_free_block() {
-	if(freelist == NULL) return NULL;
-	block_t *bloco = freelist;
-	freelist = freelist->next;
-	return bloco;
-}
-
-static inline void free_block(block_t *b) {
-	if(freelist != NULL) b->next = freelist;
-	b->ativo = 0;
-	freelist = b;
-}
-
 //função para manipular os ingredientes com segurança
 static inline int existe(const unsigned codigo) {
-	for(int i = 0; i < numero_ingredientes; i++)
+	for(int i = 0; i < diff; i++)
 		if(ingredientes[i].ativo == 1 && ingredientes[i].ingrediente.codigo == codigo) return true;
 
 	return false;
 }
 
 static inline block_t *encontrar(const unsigned codigo) {
-	for(int i = 0; i < numero_ingredientes; i++)
+	for(int i = 0; i < diff; i++)
 		if(ingredientes[i].ativo == 1 && ingredientes[i].ingrediente.codigo == codigo) return &ingredientes[i];
 
 	return NULL;
@@ -218,20 +221,10 @@ static inline void estoque_iniciado_checar() {
 static inline int adicionar(ingrediente_t ingrediente) {
 	if(existe(ingrediente.codigo)) return CODIGO_EXISTENTE;
 
-	block_t *b = take_free_block();
-	if(b != NULL) {
-		b->ingrediente = ingrediente;
-		b->ativo = 1;
-		b->next = NULL;
+	block_t *b = new_block();
+	if(b == NULL) return SEM_MEMORIA;
 
-		return SUCESSO;
-	}
-
-	if(numero_ingredientes * sizeof(ingrediente) > buffer_size)
-		if(!buffer_aumentar()) return SEM_MEMORIA;
-	ingredientes[numero_ingredientes].ativo = 1;
-	ingredientes[numero_ingredientes++].ingrediente = ingrediente;
-
+	b->ingrediente = ingrediente;
 
 	return SUCESSO;
 }
@@ -246,10 +239,8 @@ static inline int remover(const unsigned codigo) {
 
 //Função de inicio
 int estoque_iniciar() {
-	buffer_size = ((numero_ingredientes + 4096) / 4096) * 4096 * sizeof(ingrediente_t);
-
-	ingredientes = malloc(buffer_size);
-	if(ingredientes == NULL) return SEM_MEMORIA;
+	buffer_size = ((buffer_size + 4096) / 4096) * 4096 * sizeof(ingrediente_t);
+	block_init();
 
 	return SUCESSO;
 }
@@ -274,10 +265,14 @@ int __procurar_ingredientes_NOME(ingrediente_t *restrict destino, const char *re
 	estoque_iniciado_checar();
 
 	unsigned dest_idx = 0;
-	for(int i = 0; i < numero_ingredientes; i++) {
+	char lower_dest[64];
+	char lower_nome[64];
+	lower_string(lower_dest, nome);
+	for(int i = 0; i < diff; i++) {
 		if(ingredientes[i].ativo == 0) continue;
-
-		if(strncmp(nome, ingredientes[i].ingrediente.nome, strlen(nome)) == 0) {
+		
+		lower_string(lower_nome, ingredientes[i].ingrediente.nome);
+		if(strncmp(lower_dest, lower_nome, strlen(nome)) == 0) {
 			destino[dest_idx] = ingredientes[i].ingrediente;
 			dest_idx++;
 		}
@@ -293,7 +288,7 @@ int __procurar_ingredientes_CODIGO(ingrediente_t *restrict destino, const unsign
 	estoque_iniciado_checar();
 
 	unsigned dest_idx = 0;
-	for(int i = 0; i < numero_ingredientes; i++) {
+	for(int i = 0; i < diff; i++) {
 		if(ingredientes[i].ativo == 0) continue;
 
 		if(numero_comeca_com(ingredientes[i].ingrediente.codigo, codigo))
@@ -367,7 +362,7 @@ int ingrediente_editar(const unsigned codigo, const int secao,const float valor)
 	return SUCESSO;
 }
 
-int ingrediente_estocar(const unsigned int codigo, const unsigned int quantidade) {
+int estoque_adicionar(const unsigned int codigo, const unsigned int quantidade) {
 	estoque_iniciado_checar();
 
 	ingrediente_t *ingrediente = NULL;
@@ -379,7 +374,7 @@ int ingrediente_estocar(const unsigned int codigo, const unsigned int quantidade
 	return SUCESSO;
 }
 
-int ingrediente_usar(const unsigned int codigo, const unsigned int quantidade) {
+int estoque_remover(const unsigned int codigo, const unsigned int quantidade) {
 	estoque_iniciado_checar();
 
 	ingrediente_t *ingrediente = NULL;
@@ -397,7 +392,7 @@ int ingrediente_usar(const unsigned int codigo, const unsigned int quantidade) {
 int ingrediente_listar(ingrediente_t *restrict destino,const unsigned tamanho, int tipo, int ordem) {
 	estoque_iniciado_checar();
 
-	for(int i = 0; i < numero_ingredientes; i++) destino[i] = ingredientes[i].ingrediente;
+	for(int i = 0; i < diff; i++) destino[i] = ingredientes[i].ingrediente;
 
 	switch(tipo) {
 		case NOME:
@@ -421,7 +416,7 @@ int ingredientes_listar_faltando(ingrediente_t *restrict destino) {
 
 	int dest_idx = 0;
 
-	for(int i = 0; i < numero_ingredientes; i++) {
+	for(int i = 0; i < diff; i++) {
 		if(ingredientes[i].ativo == false) continue;
 		if(ingredientes[i].ingrediente.quantidade > ingredientes[i].ingrediente.quatidade_minima) continue;
 
