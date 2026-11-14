@@ -24,7 +24,7 @@ typedef const enum {
 	ESTOQUE_AINDA_DISPONIVEL,
 
 	SECAO_INVALIDA,
-
+	TIPO_INVALIDO,
 	UNIDADE_INVALIDA,
 } estoque_status_t;
 
@@ -46,6 +46,12 @@ typedef const enum {
 } tipo_t;
 
 typedef struct {
+	char * name;
+	unsigned code;
+	int quantity;
+} estoque_registro_t;
+
+typedef struct {
 	unsigned codigo;
 	char nome[64];
 	unidade_t unidade_de_medida;
@@ -61,8 +67,7 @@ int __procurar_ingredientes_NOME(ingrediente_t *restrict destino, const char *re
 int __procurar_ingredientes_CODIGO(ingrediente_t *restrict destino, const unsigned long codigo); //
 #define procurar_ingredientes(dest, value, tipo) __procurar_ingredientes_##tipo(dest, value) //
 int listar_ingrediente(ingrediente_t * restrict destino, const unsigned tamanho ,tipo_t tipo, ordem_t ordem); //
-
-void print_ingrediente(const ingrediente_t *restrict ing);
+int listar_ingredientes_faltando(ingrediente_t * restrict destino);
 
 ingrediente_t *checar_ingrediente(const unsigned codigo); //
 estoque_status_t adicionar_ingrediente(const char * restrict nome,
@@ -71,10 +76,12 @@ estoque_status_t adicionar_ingrediente(const char * restrict nome,
 		const float quantidade_minima, 
 		const float custo_unitario); //
 estoque_status_t remover_ingrediente(const unsigned codigo); //
-estoque_status_t editar_ingrediente(const unsigned codigo, const secao_t secao, unsigned valor);
+estoque_status_t editar_ingrediente(const unsigned codigo, const secao_t secao,const float valor);
 
 estoque_status_t estocar_ingrediente(const unsigned codigo, const unsigned quantidade); //
 estoque_status_t usar_ingrediente(const unsigned codigo, const unsigned quantidade); //
+
+void gerar_registro(estoque_registro_t *dest);
 
 
 #endif
