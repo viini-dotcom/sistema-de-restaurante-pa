@@ -12,6 +12,10 @@ enum {
 	FRANGO,
 };
 
+typedef struct {
+	unsigned codigo;
+	float quantidade;
+} __ing_info_t;
 
 
 typedef struct {
@@ -19,7 +23,9 @@ typedef struct {
 	char nome[128];
 	int categoria;
 	float preco;
-	ingrediente_t ings[64];
+
+	__ing_info_t ing[64];
+	unsigned ing_num;
 } receita_t;
 
 int receita_iniciar();
