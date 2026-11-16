@@ -40,7 +40,7 @@ enum {
 };
 
 enum {
-	NOME,
+	NOME = 0,
 	PRECO,
 	CODIGO,
 };

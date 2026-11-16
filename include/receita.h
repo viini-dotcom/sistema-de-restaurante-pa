@@ -3,6 +3,17 @@
 #ifndef RECEITA_H
 #define RECEITA_H
 enum {
+	RECEITA_INVALIDA = 0,
+	RECEITA_INGREDIENTE_INVALIDO,
+	INGREDIENTE_INVALIDO,
+	RECEITA_JA_EXISTE,	
+	RECEITA_INGREDIENTE_JA_EXISTE,	
+};
+
+
+
+
+enum {
 	MASSA = 0,
 	SALADA,
 	SOBREMESA,
@@ -12,9 +23,17 @@ enum {
 	FRANGO,
 };
 
+enum {
+	RECEITA_NOME,
+	RECEITA_PRECO,
+	RECEITA_CATEGORIA,
+	RECEITA_CODIGO,
+};
+
 typedef struct {
 	unsigned codigo;
 	float quantidade;
+	unsigned ativo;
 } __ing_info_t;
 
 
