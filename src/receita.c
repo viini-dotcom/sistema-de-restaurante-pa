@@ -328,10 +328,11 @@ editar_ing(const unsigned cod_rec, const unsigned cod_ing, const unsigned qnt)
 
 //Principal
 int 
-receita_iniciar() 
+receita_iniciar(receita_t *lista) 
 {
 	buffer_size = ((buffer_size + 4096)/4096) * 4096 * sizeof(receita_t);
 	block_init();
+	while(lista++) adicionar(*lista);
 
 	return SUCESSO;
 }

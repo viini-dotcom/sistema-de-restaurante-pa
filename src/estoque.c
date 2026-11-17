@@ -267,10 +267,11 @@ remover(const unsigned codigo)
 
 //Função de inicio
 int 
-estoque_iniciar() 
+estoque_iniciar(ingrediente_t *lista) 
 {
 	buffer_size = ((buffer_size + 4096) / 4096) * 4096 * sizeof(ingrediente_t);
 	block_init();
+	while(lista++) adicionar(*lista);
 
 	return SUCESSO;
 }

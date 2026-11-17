@@ -38,7 +38,7 @@ typedef struct {
 	unsigned ing_num;
 } receita_t;
 
-int receita_iniciar();
+int receita_iniciar(receita_t *);
 int receita_encerrar();
 
 int __receita_editar_NOME(const unsigned codigo, const char * restrict nome);

@@ -68,7 +68,7 @@ int __ingrediente_editar_UNIDADE_DE_MEDIDA(const unsigned codigo, const int unid
 int __ingrediente_editar_QUANTIDADE_MINIMA(const unsigned codigo, const float quantidade_minima);
 int __ingrediente_editar_CUSTO_UNITARIO(const unsigned codigo, const float custo_unitario);
 
-int estoque_iniciar();
+int estoque_iniciar(ingrediente_t *);
 void estoque_encerrar();
 
 #define ingredientes_procurar(dest, value, tipo) __ingredientes_procurar_##tipo(dest, value) //
