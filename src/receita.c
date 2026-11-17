@@ -332,7 +332,7 @@ receita_iniciar(receita_t *lista)
 {
 	buffer_size = ((buffer_size + 4096)/4096) * 4096 * sizeof(receita_t);
 	block_init();
-	while(lista++) adicionar(*lista);
+	do adicionar(*lista); while(lista++);
 
 	return SUCESSO;
 }
