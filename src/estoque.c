@@ -30,8 +30,9 @@ static block_t * buffer_top = NULL;
 static unsigned diff = 0;
 
 static inline int 
-block_init() 
+block_init(unsigned size) 
 {
+	buffer_size = size * sizeof(block_t);
 	ingredientes = malloc(buffer_size);
 	if(ingredientes == NULL) return SEM_MEMORIA;
 	buffer_top = ingredientes;
@@ -60,14 +61,19 @@ free_block(block_t *b)
 static inline block_t *
 new_block() 
 {
+
 	block_t * b = NULL;
 	if((b = take_free_block())) return b;
 
-	if(buffer_size < buffer_top - ingredientes) {
-		void *tmp = realloc(ingredientes, (buffer_size * 2) * sizeof(ingrediente_t));
-		if(tmp == NULL) return NULL;
+	if(buffer_size <= (buffer_top - ingredientes) * sizeof(block_t)) {
+		unsigned long diff = buffer_top - ingredientes;
+		void *tmp = realloc(ingredientes, buffer_size * 2);
+
+		if(tmp == NULL) return NULL;	
 
 		ingredientes = tmp;
+		buffer_top = ingredientes + diff;
+
 		buffer_size *= 2;
 	}
 
@@ -269,8 +275,7 @@ remover(const unsigned codigo)
 int 
 estoque_iniciar(ingrediente_t *lista) 
 {
-	buffer_size = ((buffer_size + 4096) / 4096) * 4096 * sizeof(ingrediente_t);
-	block_init();
+	block_init(512);
 	while(lista)
 		adicionar(*lista++);
 

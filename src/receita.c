@@ -31,9 +31,11 @@ static block_t * buffer_top = NULL;
 static unsigned diff = 0;
 
 static inline int 
-block_init() 
+block_init(unsigned size) 
 {
+	buffer_size = size * sizeof(block_t);
 	receitas = malloc(buffer_size);
+
 	if(receitas == NULL) return SEM_MEMORIA;
 	buffer_top = receitas;
 
@@ -63,12 +65,15 @@ new_block()
 {
 	block_t * b = NULL;
 	if((b = take_free_block())) return b;
-
-	if(buffer_size < buffer_top - receitas) {
-		void *tmp = realloc(receitas, (buffer_size * 2) * sizeof(ingrediente_t));
+	
+	if(buffer_size <= (buffer_top - receitas) * sizeof(block_t)) {
+		unsigned long diff = buffer_top - receitas;
+		void *tmp = realloc(receitas, (buffer_size * 2));
 		if(tmp == NULL) return NULL;
-
+			
 		receitas = tmp;
+		buffer_top = receitas + diff;
+
 		buffer_size *= 2;
 	}
 
@@ -330,8 +335,7 @@ editar_ing(const unsigned cod_rec, const unsigned cod_ing, const unsigned qnt)
 int 
 receita_iniciar(receita_t *lista) 
 {
-	buffer_size = ((buffer_size + 4096)/4096) * 4096 * sizeof(receita_t);
-	block_init();
+	block_init(512);
 	while(lista)
 		adicionar(*lista++);
 
