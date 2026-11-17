@@ -208,7 +208,7 @@ encontrar(const unsigned codigo)
 static inline
 void receita_iniciado_checar() 
 {
-	if(buffer_size == 0) panic("Estoque não iniciado\nUse estoque_iniciar()", ESTOQUE_NAO_INICIADO);
+	if(buffer_size == 0) panic("Estoque não iniciado\nUse receita_iniciar()", ESTOQUE_NAO_INICIADO);
 	if(receitas == NULL) panic("Referencia de estoque perdida", ESTOQUE_NULO);
 }
 
@@ -231,35 +231,6 @@ remover(const unsigned codigo)
 	block_t *bloco = encontrar(codigo);
 	if(bloco == NULL) return INGREDIENTE_INEXISTENTE;
 	free_block(bloco);
-
-	return SUCESSO;
-}
-
-static int
-editar(const unsigned codigo, const int secao, const long long valor) 
-{
-	block_t *blk = encontrar(codigo);
-	if(blk == NULL) return INGREDIENTE_INEXISTENTE;
-
-	switch(secao) {
-		case RECEITA_NOME:;
-			char *str = (char *)valor;
-			strcpy(blk->receita.nome, str);
-
-			break;
-		case RECEITA_CATEGORIA:
-			blk->receita.categoria = valor;
-			break;
-		case RECEITA_PRECO:;
-			float preco = (float)valor;
-			blk->receita.preco = preco;
-
-			break;
-		case RECEITA_CODIGO:;
-
-
-		default: return -1;
-	}
 
 	return SUCESSO;
 }
@@ -355,7 +326,7 @@ editar_ing(const unsigned cod_rec, const unsigned cod_ing, const unsigned qnt)
 
 
 
-
+//Principal
 int 
 receita_iniciar() 
 {
@@ -377,6 +348,8 @@ receita_encerrar()
 int 
 receita_adicionar(const char *restrict nome, const unsigned int codigo, int categoria, const float preco) 
 {
+	receita_iniciado_checar();
+
 	receita_t new = {
 		.categoria = categoria,
 		.codigo = codigo,
@@ -395,6 +368,8 @@ receita_adicionar(const char *restrict nome, const unsigned int codigo, int cate
 int 
 receita_remover(const unsigned int codigo) 
 {
+	receita_iniciado_checar();
+
 	int status = remover(codigo);
 	if(status) return status;
 
@@ -404,6 +379,8 @@ receita_remover(const unsigned int codigo)
 int 
 receita_adicionar_ingrediente(const unsigned int codigo, const unsigned ing_codigo, const unsigned quantidade) 
 {
+	receita_iniciado_checar();
+
 	int status = adicionar_ing(codigo, ing_codigo, quantidade);
 	if(status) return status;
 
@@ -413,6 +390,8 @@ receita_adicionar_ingrediente(const unsigned int codigo, const unsigned ing_codi
 int 
 receita_remover_ingrediente(const unsigned int receita_codigo, const unsigned int ing_codigo) 
 {
+	receita_iniciado_checar();
+
 	int status = remover_ing(receita_codigo, ing_codigo);
 	if(status) return status;
 
@@ -422,6 +401,8 @@ receita_remover_ingrediente(const unsigned int receita_codigo, const unsigned in
 ingrediente_t * 
 receita_checar_ingrediente(const unsigned receita_codigo, const unsigned ing_codigo) 
 {
+	receita_iniciado_checar();
+
 	__ing_info_t *i = encontrar_ing(receita_codigo, ing_codigo);
 	if(i == NULL) return NULL;
 
@@ -432,6 +413,8 @@ receita_checar_ingrediente(const unsigned receita_codigo, const unsigned ing_cod
 int 
 __receita_editar_CATEGORIA(const unsigned int codigo, const int categoria) 
 {
+	receita_iniciado_checar();
+
 	block_t *r = encontrar(codigo);
 	if(r == NULL) return RECEITA_INVALIDA;
 	r->receita.categoria = categoria;
@@ -442,6 +425,8 @@ __receita_editar_CATEGORIA(const unsigned int codigo, const int categoria)
 int 
 __receita_editar_NOME(const unsigned int codigo, const char * restrict nome) 
 {
+	receita_iniciado_checar();
+
 	block_t *r = encontrar(codigo);
 	if(r == NULL) return RECEITA_INVALIDA;
 	strcpy(r->receita.nome, nome);
@@ -452,6 +437,8 @@ __receita_editar_NOME(const unsigned int codigo, const char * restrict nome)
 int 
 __receita_editar_PRECO(const unsigned int codigo, const float preco) 
 {
+	receita_iniciado_checar();
+
 	block_t *r = encontrar(codigo);
 	if(r == NULL) return RECEITA_INVALIDA;
 	r->receita.preco = preco;
@@ -519,6 +506,8 @@ receita_listar(receita_t *restrict destino,const unsigned tamanho, int tipo, int
 int 
 receita_ingrediente_listar(ingrediente_t *dest, const unsigned int receita_codigo)
 {
+	receita_iniciado_checar();
+
 	int dest_idx = 0;
 	block_t *r = encontrar(receita_codigo);
 	if(r == NULL) return RECEITA_INVALIDA;
@@ -536,6 +525,8 @@ receita_ingrediente_listar(ingrediente_t *dest, const unsigned int receita_codig
 int
 receita_ingrediente_disponivel(const unsigned int receita_codigo, const unsigned quantidade) 
 {
+	receita_iniciado_checar();
+
 	ingrediente_t dest[64];
 	int idx = receita_ingrediente_listar(dest, receita_codigo);
 	if(idx <= 0) return -1;

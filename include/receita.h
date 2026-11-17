@@ -11,9 +11,6 @@ enum {
 	INGREDIENTE_INSUFICIENTE,
 };
 
-
-
-
 enum {
 	MASSA = 0,
 	SALADA,
@@ -22,13 +19,6 @@ enum {
 	SALGADO,
 	CARNE,
 	FRANGO,
-};
-
-enum {
-	RECEITA_NOME,
-	RECEITA_PRECO,
-	RECEITA_CATEGORIA,
-	RECEITA_CODIGO,
 };
 
 typedef struct {
