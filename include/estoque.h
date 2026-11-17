@@ -66,8 +66,8 @@ int __procurar_ingredientes_CODIGO(ingrediente_t *restrict destino, const unsign
 int estoque_iniciar();
 void estoque_encerrar();
 
-#define 			ingredientes_procurar(dest, value, tipo) __procurar_ingredientes_##tipo(dest, value) //
-int ingrediente_listar(ingrediente_t * restrict destino, const unsigned tamanho ,int tipo, int ordem); //
+#define ingredientes_procurar(dest, value, tipo) __procurar_ingredientes_##tipo(dest, value) //
+int ingrediente_listar(ingrediente_t * restrict destino, const unsigned tamanho ,int valor, int ordem); //
 int ingredientes_listar_faltando(ingrediente_t * restrict destino);
 
 ingrediente_t *ingrediente_checar(const unsigned codigo); //

@@ -97,6 +97,7 @@ void gerar_registro(estoque_registro_t *dest) {
 
 //Ferramentas
 static int numero_comeca_com(unsigned numero, const unsigned comeco) {
+
 	while(numero != 0 && numero !=  comeco)
 		numero /= 10;
 
@@ -105,38 +106,25 @@ static int numero_comeca_com(unsigned numero, const unsigned comeco) {
 	return true;
 }
 
-
-static char * lower_string(char * restrict dest, const char * restrict string) {
-	for(int i = 0; i < strlen(string); i++) dest[i] = tolower(string[i]);
+static char * strlower(char * restrict dest,const char * restrict s) {
+	for(int i = 0; i < strlen(s); i++)
+		dest[i] = tolower(s[i]);
 
 	return dest;
 }
 
+static int strcmp_lower(const char * restrict s1, const char * restrict s2) {
+	char buf1[256];
+	char buf2[256];
 
-//Retorna false se i2 vem primeiro que i1
-static int compare_ingredients_nome(ingrediente_t * restrict i1, ingrediente_t * restrict i2) {
-	unsigned s1len = strlen(i1->nome);
-	unsigned s2len = strlen(i2->nome);
-	unsigned min = (s1len > s2len) ? s2len : s1len;
-	char s1[32];
-	char s2[32];
-	unsigned cmp = strncmp(lower_string(s1, i1->nome), lower_string(s2, i2->nome), min);
+	return strcmp(strlower(buf1, s1), strlower(buf2, s2));
+}
 
-	if(cmp == 0) {
-		if(s1len > s2len)
-			return false;
-		return true;
-	}
+static int strncmp_lower(const char * restrict s1, const char * restrict s2, unsigned len) {
+	char buf1[256];
+	char buf2[256];
 
-	for(int i = 0; i < min; i++) {
-		if(i1->nome[i] - i2->nome[i] == 0) continue;
-		if(-(i1->nome[i] - i2->nome[i]) > 0) return true;
-		return false;
-	}
-
-
-
-	return true;
+	return strncmp(strlower(buf1, s1), strlower(buf2, s2), len);
 }
 
 static inline void trocar_posicao_ingredientes(ingrediente_t * restrict i1, ingrediente_t * restrict i2) {
@@ -149,14 +137,14 @@ static inline void trocar_posicao_ingredientes(ingrediente_t * restrict i1, ingr
 static ingrediente_t * ordernar_ingredientes_nome(ingrediente_t * restrict dest, unsigned length, int ordem) {
 	for(int i = 0; i < length; i++) {
 		for(int j = i + 1; j < length; j++) {
-			int vem_primeiro = compare_ingredients_nome(&dest[j], &dest[i]); //dest[j].nome vem primeiro que dest[i].nome ?
+			int n = strcmp_lower(dest[i].nome, dest[j].nome);
 			if(ordem == CRESCENTE) {
-				if(vem_primeiro == false) continue; //aqui se caso nao, então não é pra troca
+				if(n < 0) continue; //aqui se caso nao, então não é pra troca
 				trocar_posicao_ingredientes(&dest[i], &dest[j]);
 				continue;
 			}
 			if(ordem == DECRESCENTE) {
-				if(vem_primeiro == true) continue; //aqui se caso sim, não é pra trocar
+				if(n > 0) continue; //aqui se caso sim, não é pra trocar
 				trocar_posicao_ingredientes(&dest[i], &dest[j]);
 				continue;
 			}
@@ -265,21 +253,15 @@ int __procurar_ingredientes_NOME(ingrediente_t *restrict destino, const char *re
 	estoque_iniciado_checar();
 
 	unsigned dest_idx = 0;
-	char lower_dest[64];
-	char lower_nome[64];
-	lower_string(lower_dest, nome);
 	for(int i = 0; i < diff; i++) {
 		if(ingredientes[i].ativo == 0) continue;
-		
-		lower_string(lower_nome, ingredientes[i].ingrediente.nome);
-		if(strncmp(lower_dest, lower_nome, strlen(nome)) == 0) {
+		if(strncmp_lower(nome , ingredientes[i].ingrediente.nome, strlen(nome)) == 0) {
 			destino[dest_idx] = ingredientes[i].ingrediente;
 			dest_idx++;
 		}
 	}
 
 	ordernar_ingredientes_nome(destino, dest_idx, CRESCENTE);
-
 
 	return dest_idx;
 }
