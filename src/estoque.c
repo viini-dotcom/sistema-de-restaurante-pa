@@ -271,7 +271,9 @@ estoque_iniciar(ingrediente_t *lista)
 {
 	buffer_size = ((buffer_size + 4096) / 4096) * 4096 * sizeof(ingrediente_t);
 	block_init();
-	do adicionar(*lista); while(lista++);
+	while(lista)
+		adicionar(*lista++);
+
 
 	return SUCESSO;
 }
