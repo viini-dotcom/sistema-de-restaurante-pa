@@ -8,6 +8,7 @@ enum {
 	INGREDIENTE_INVALIDO,
 	RECEITA_JA_EXISTE,	
 	RECEITA_INGREDIENTE_JA_EXISTE,	
+	INGREDIENTE_INSUFICIENTE,
 };
 
 
@@ -70,5 +71,8 @@ int receita_remover_ingrediente(const unsigned receita_codigo, const unsigned in
 ingrediente_t * receita_checar_ingrediente(const unsigned receita_codigo, const unsigned ing_codigo);
 
 int receita_ingrediente_listar(ingrediente_t * dest, const unsigned receita_codigo);
+int receita_ingrediente_disponivel(const unsigned int receita_codigo, const unsigned quantidade);
+int receita_fazer(const unsigned int receita_codigo, const unsigned quantidade);
+
 
 #endif

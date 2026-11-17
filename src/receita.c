@@ -281,6 +281,7 @@ encontrar_ing(const unsigned cod_rec, const unsigned cod_ing)
 {
 	block_t * rec = encontrar(cod_rec);
 	if(rec == NULL) return NULL;
+
 	for(int i = 0; i < rec->receita.ing_num; i++)
 		if(rec->receita.ing[i].ativo == true && rec->receita.ing[i].codigo == cod_ing) return &rec->receita.ing[i];
 
@@ -530,4 +531,39 @@ receita_ingrediente_listar(ingrediente_t *dest, const unsigned int receita_codig
 		}
 
 	return dest_idx;
+}
+
+int
+receita_ingrediente_disponivel(const unsigned int receita_codigo, const unsigned quantidade) 
+{
+	ingrediente_t dest[64];
+	int idx = receita_ingrediente_listar(dest, receita_codigo);
+	if(idx <= 0) return -1;
+
+	for(int i = 0; i < idx; i++) {
+		__ing_info_t *ing = encontrar_ing(receita_codigo, dest[i].codigo);
+		if(ing == NULL) return -1;
+		if(dest[i].quantidade < ing->quantidade * quantidade) return INGREDIENTE_INSUFICIENTE;
+	}
+	
+	return SUCESSO;
+}
+
+int 
+receita_fazer(const unsigned int receita_codigo, const unsigned int quantidade) {
+	int status = receita_ingrediente_disponivel(receita_codigo, quantidade);
+	if(status) return status;
+
+	ingrediente_t dest[64];
+	int idx = receita_ingrediente_listar(dest, receita_codigo);
+	if(idx <= 0) return -1;
+
+	for(int i = 0; i < idx; i++) 
+	{
+		__ing_info_t *ing = encontrar_ing(receita_codigo, dest[i].codigo);
+		status  = estoque_remover(ing->codigo, ing->quantidade * quantidade);
+		if(status) return status;
+	}
+
+	return SUCESSO;
 }
