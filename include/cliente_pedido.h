@@ -11,8 +11,8 @@ struct cliente
     {
         int codigo;
         struct cliente c;
-        int quantidade[32];
-        int receita[32];
+        int *quantidade;
+        int *receita;
         char data[10];
         float valor;
         char status[13];
