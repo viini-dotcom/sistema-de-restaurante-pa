@@ -1,3 +1,7 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 int *d;
 
 
@@ -13,8 +17,8 @@ struct cliente
     {
         int codigo;
         struct cliente c;
-        int quantidade[32];
-        int receita[32];
+        int *quantidade;
+        int *receita;
         char data[10];
         float valor;
         char status[13];
@@ -44,7 +48,7 @@ void remover_cliente(struct pedido *p, int *A)
 
     void adicionar_cliente(struct pedido *p, receita_t *R, int *e)
     {
-        int n=0, m=1, l;
+        int n=0, m=1, l, quant_r, *r;
         p[*d].valor=0;
 
         getchar();
@@ -159,27 +163,24 @@ void remover_cliente(struct pedido *p, int *A)
             getchar();
         }
 
-        int i=0;
+        printf("digite a quantidade de receitas solicitadas: ");
+        scanf("%d", &quant_r);
 
-        while(m==1 && i<=32)
+        p[*d].receita=(int *) malloc(quant_r*sizeof(int));
+        p[*d].quantidade=(int *) malloc(quant_r*sizeof(int));
+        
+        if(p[*d].receita==NULL || p[*d].quantidade==NULL)
         {
-            printf("digite o código da receita solicitada: ");
-            scanf("%d", &p[*d].receita[i]);
-
-            while(scanf("%d", &p[*d].receita[i])!=1)
-        {
-            printf("o valor digitado não é inteiro, tente novamente\n");
-
-            printf("digite o código da receita solicitada: ");
-            scanf("%d", &p[*d].receita[i]);
-
+            printf("ERRO: ESTOURO DE MEMÓRIA")
+            system("pause");
         }
 
         l=0;
 
-        while(l!=1)
+        for(int i=0; i<quant_r; i++)
         {
-            printf("a receita solicitada não existe, tente novamente\n");
+            printf("digite o código da receita solicitada: ");
+            scanf("%d", &p[*d].receita[i]);
 
             for(int j=0; j<*e; j++)
              {
@@ -188,6 +189,22 @@ void remover_cliente(struct pedido *p, int *A)
                     l=1;
                 }
             }
+
+            while(scanf("%d", &p[*d].receita[i])!=1 || l!=1)
+        {
+            printf("o valor digitado não é inteiro ou a receita solicitada não existe, tente novamente\n");
+
+            printf("digite o código da receita solicitada: ");
+            scanf("%d", &p[*d].receita[i]);
+
+            for(int j=0; j<*e; j++)
+             {
+                if(p[*d].receita==R[j].PRECO)
+                {
+                    l=1;
+                }
+            }
+
         }
 
             getchar();
@@ -218,9 +235,8 @@ void remover_cliente(struct pedido *p, int *A)
 
             i=i+1;
 
-            printf("digite 1 para acrescentar alguma receita ou 0 para seguir para o próximo passo: ");
-            scanf("%d", &m);
             getchar(); 
+        
         }
 
         printf("digite o status do pedido");
@@ -237,12 +253,13 @@ void remover_cliente(struct pedido *p, int *A)
         {
             if(*A==p[i].c.codigo)
             {
-                getchar();
                 printf("digite o nome do cliente: ");
                 fgets(p[i].c.nome, sizeof(p[i].c.nome), stdin);
+                getchar();
                 
                 printf("digite o código do cliente: ");
                 scanf("%d", &p[i].c.codigo);
+                getchar();
                 
                 printf("digite o endereço do cliente: ");
                 fgets(p[i].c.endereço, sizeof(p[i].c.endereço), stdin);
@@ -279,14 +296,20 @@ void remover_cliente(struct pedido *p, int *A)
         {
             if(*A==p[i].c.codigo || *A==p[i].codigo)
             {
-                getchar();
                 printf("código do pedido: %d\n", p[i].codigo);
                 printf("código do cliente: %d\n", p[i].c.codigo);
                 printf("data do pedido: %s\n", p[i].data);
                 printf("nome do cliente: %s\n", p[i].c.nome);
                 printf("endereço do cliente: %s\n", p[i].c.endereço);
                 printf("telefone do cliente: %d\n", p[i].c.telefone);
-                printf("quantidade do pedido: %d\n", p[i].quantidade);
+
+                for(int j=0; j<(sizeof(p[*d].receita)/sizeof(p[*d].receita[0]))+1; j++)
+                {
+                    printf("código das receitas solicitadas e suas quantidades:\n");
+
+                    printf("%d: %d", p[*d].receita[j], p[*d].quantidade[j]);
+                }
+
                 printf("valor do pedido: %f\n", p[i].valor);
                 printf("status do pedido: %s\n", p[i].status);
 
@@ -301,14 +324,20 @@ void remover_cliente(struct pedido *p, int *A)
         {
             if(strstr(p[i].c.nome, busca)!=NULL)
             {
-                getchar();
                 printf("código do pedido: %d\n", p[i].codigo);
                 printf("código do cliente: %d\n", p[i].c.codigo);
                 printf("data do pedido: %s\n", p[i].data);
                 printf("nome do cliente: %s\n", p[i].c.nome);
                 printf("endereço do cliente: %s\n", p[i].c.endereço);
                 printf("telefone do cliente: %d\n", p[i].c.telefone);
-                printf("quantidade do pedido: %d\n", p[i].quantidade);
+                
+                for(int j=0; j<(sizeof(p[*d].receita)/sizeof(p[*d].receita[0]))+1; j++)
+                {
+                    printf("código das receitas solicitadas e suas quantidades:\n");
+
+                    printf("%d: %d", p[*d].receita[j], p[*d].quantidade[j]);
+                }
+
                 printf("valor do pedido: %f\n", p[i].valor);
                 printf("status do pedido: %s\n", p[i].status);
             }
