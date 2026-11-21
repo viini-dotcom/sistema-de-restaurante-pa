@@ -166,13 +166,14 @@ void remover_pedido(struct pedido *p, int *A)
 
         printf("digite a quantidade de receitas solicitadas: ");
         scanf("%d", &quant_r);
+        
 
         p[d].receita=(int *) malloc(quant_r*sizeof(int));
         p[d].quantidade=(int *) malloc(quant_r*sizeof(int));
         
         if(p[d].receita==NULL || p[d].quantidade==NULL)
         {
-            printf("ERRO: ESTOURO DE MEMÓRIA")
+            printf("ERRO: ESTOURO DE MEMÓRIA");
             system("pause");
         }
 
