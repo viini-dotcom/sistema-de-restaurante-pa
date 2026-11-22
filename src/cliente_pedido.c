@@ -31,7 +31,7 @@ void remover_pedido(struct pedido *p, int *A)
         {
             if(*A==p[i].c.codigo)
             {
-                for(int j=i; j<(d+1-i); j++)
+                for(int j=i; j<(d-i); j++)
                 {
                     p[j]=p[j+1];
                 }
