@@ -38,6 +38,8 @@ void remover_pedido(struct pedido *p, int *A)
                 
             d=d-1;
             
+            p=(struct pedido *) realloc(d*sizeof(struct pedido));
+            
             break;    
             }
                 
@@ -212,7 +214,7 @@ void remover_pedido(struct pedido *p, int *A)
             getchar();
 
             printf("digite a quantidade: ");
-            scanf("%d", p[d].quantidade[i]);
+            scanf("%d", &p[d].quantidade[i]);
 
             while(scanf("%d", &p[d].quantidade[i])!=1)
         {
