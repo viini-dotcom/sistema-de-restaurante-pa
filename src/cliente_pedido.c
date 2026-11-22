@@ -38,7 +38,7 @@ void remover_pedido(struct pedido *p, int *A)
                 
             d=d-1;
             
-            p=(struct pedido *) realloc(d*sizeof(struct pedido));
+            p=(struct pedido *) realloc(p, d*sizeof(struct pedido));
             
             break;    
             }
@@ -50,6 +50,19 @@ void remover_pedido(struct pedido *p, int *A)
 
     void adicionar_cliente(struct pedido *p, receita_t *R, int *e)
     {
+        struct pedido *aux;
+
+        aux=(struct pedido *) realloc(p, (d+1)*sizeof(struct pedido));
+        if(aux!=NULL)
+        {
+            p=aux;
+        }
+
+        if("aux!=NULL")
+        {
+            printf("ERRO: ESTOURO DE MEMÓRIA");
+            system("pause");
+        }
 
         int n=0, m=1, l=0, quant_r;
         p[d].valor=0;
