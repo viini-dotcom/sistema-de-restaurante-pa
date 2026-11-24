@@ -68,7 +68,6 @@ void remover_pedido(struct pedido *p, int *A)
         float retorno;
         p[d].valor=0;
 
-        getchar();
         printf("digite o código do pedido: ");
         scanf("%f", &retorno);
         p[d].codigo=retorno;
@@ -112,11 +111,9 @@ void remover_pedido(struct pedido *p, int *A)
 
         printf("digite a data do pedido: ");
         fgets(p[d].data, sizeof(p[d].data), stdin);
-        getchar();
 
         printf("digite o nome do cliente: ");
         fgets(p[d].c.nome, sizeof(p[d].c.nome), stdin);
-        getchar();
 
         for(int i=0; i<d; i++)
         {
@@ -178,7 +175,6 @@ void remover_pedido(struct pedido *p, int *A)
             
             printf("digite o endereço do cliente: ");
             fgets(p[d].c.endereço, sizeof(p[d].c.endereço), stdin);
-            getchar();
             
             printf("digite o telefone do cliente: ");
             scanf("%d", &p[d].c.telefone);
@@ -260,14 +256,11 @@ void remover_pedido(struct pedido *p, int *A)
             }
 
             i=i+1;
-
-            getchar(); 
         
         }
 
         printf("digite o status do pedido");
         fgets(p[d].status, sizeof(p[d].status), stdin);
-        getchar();
 
         d=d+1;        
     }
@@ -281,7 +274,6 @@ void remover_pedido(struct pedido *p, int *A)
             {
                 printf("digite o nome do cliente: ");
                 fgets(p[i].c.nome, sizeof(p[i].c.nome), stdin);
-                getchar();
                 
                 printf("digite o código do cliente: ");
                 scanf("%d", &p[i].c.codigo);
@@ -289,7 +281,6 @@ void remover_pedido(struct pedido *p, int *A)
                 
                 printf("digite o endereço do cliente: ");
                 fgets(p[i].c.endereço, sizeof(p[i].c.endereço), stdin);
-                getchar();
 
                 printf("digite o telefone do cliente: ");
                 scanf("%d", &p[i].c.telefone);
@@ -309,7 +300,6 @@ void remover_pedido(struct pedido *p, int *A)
             {
                 printf("digite o status do pedido");
                 fgets(p[i].status, sizeof(p[i].status), stdin);
-                getchar();
 
             break;    
             }
