@@ -65,11 +65,14 @@ void remover_pedido(struct pedido *p, int *A)
         }
 
         int n=0, m=1, l=0, quant_r;
+        float retorno;
         p[d].valor=0;
 
         getchar();
         printf("digite o código do pedido: ");
-        scanf("%d", &p[d].codigo);
+        scanf("%f", &retorno);
+        p[d].codigo=retorno;
+        
 
         for(int i=0; i<d; i++)
         {
@@ -83,12 +86,13 @@ void remover_pedido(struct pedido *p, int *A)
             }
         }
 
-        while(scanf("%d", &p[d].codigo)!=1 || l==1)
+        while(p[d].codigo-retorno!=0 || p[d].codigo<0 || l==1)
         {
-            printf("o valor digitado não é inteiro ou o código está repetido, tente novamente\n");
+            printf("o valor digitado não é inteiro ou é negativo ou o código está repetido, tente novamente\n");
 
             printf("digite o código do pedido: ");
-            scanf("%d", &p[d].codigo);
+            scanf("%f", &retorno);
+            p[d].codigo=retorno;
 
             for(int i=0; i<d; i++)
             {
@@ -134,7 +138,8 @@ void remover_pedido(struct pedido *p, int *A)
         {
 
             printf("digite o código do cliente: ");
-            scanf("%d", &p[d].c.codigo);
+            scanf("%f", &retorno);
+            p[d].c.codigo=retorno;
 
             for(int i=0; i<d; i++)
             {
@@ -148,12 +153,13 @@ void remover_pedido(struct pedido *p, int *A)
                 }
             }
 
-            while(scanf("%d", &p[d].c.codigo)!=1 || l=1)
+            while(p[d].c.codigo-retorno!=0 || p[d].c.codigo<0 || l==1)
             {
-                printf("o valor digitado não é inteiro ou o código está repetido, tente novamente\n");
+                printf("o valor digitado não é inteiro ou é negativo ou o código está repetido, tente novamente\n");
                 
                 printf("digite o código do pedido: ");
-                scanf("%d", &p[d].c.codigo);
+                scanf("%f", &retorno);
+                p[d].c.codigo=retorno;
 
                 for(int i=0; i<d; i++)
                 {
@@ -197,22 +203,24 @@ void remover_pedido(struct pedido *p, int *A)
         for(int i=0; i<quant_r; i++)
         {
             printf("digite o código da receita solicitada: ");
-            scanf("%d", &p[d].receita[i]);
+            scanf("%f", &retorno);
+            p[d].receita[i]=retorno;
 
             for(int j=0; j<*e; j++)
              {
-                if(p[d].receita==R[j].PRECO)
+                if(p[d].receita[i]==R[j].PRECO)
                 {
                     l=1;
                 }
             }
 
-            while(scanf("%d", &p[d].receita[i])!=1 || l!=1)
+            while(p[d].receita[i]-retorno!=0 || p[d].receita[i]<0 || l!=1)
         {
-            printf("o valor digitado não é inteiro ou a receita solicitada não existe, tente novamente\n");
+            printf("o valor digitado não é inteiro ou é negativo ou a receita solicitada não existe, tente novamente\n");
 
             printf("digite o código da receita solicitada: ");
-            scanf("%d", &p[d].receita[i]);
+            scanf("%f", &retorno);
+            p[d].receita[i]=retorno;
 
             for(int j=0; j<*e; j++)
              {
@@ -227,11 +235,12 @@ void remover_pedido(struct pedido *p, int *A)
             getchar();
 
             printf("digite a quantidade: ");
-            scanf("%d", &p[d].quantidade[i]);
+            scanf("%f", &retorno);
+            p[d].quantidade[i]=retorno;
 
-            while(scanf("%d", &p[d].quantidade[i])!=1)
+            while(p[d].quantidade[i]-retorno!=0 || p[d].quantidade[i]<0)
         {
-            printf("o valor digitado não é inteiro, tente novamente\n");
+            printf("o valor digitado não é inteiro ou é negativo, tente novamente\n");
 
             printf("digite o código do pedido: ");
             scanf("%d", &p[d].quantidade[i]);
