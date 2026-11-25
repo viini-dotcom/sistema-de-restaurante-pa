@@ -19,9 +19,9 @@ struct cliente
         char status[13];
     };
 
-    void remover_cliente(struct pedido *p, int *A);
+    void remover_pedido(struct pedido *p, int *A);
 
-    void adicionar_cliente(struct pedido *p, receita_t *R, int *e);
+    void adicionar_pedido(struct pedido *p, receita_t *R, int *e);
 
     void alterar_cliente(struct pedido *p, int *A);
 
