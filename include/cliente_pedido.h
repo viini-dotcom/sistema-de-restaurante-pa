@@ -1,3 +1,5 @@
+#ifndef cliente_pedido.h
+#define cliente_pedido.h
 struct cliente
     {
         int codigo;
@@ -36,3 +38,5 @@ struct cliente
     void ordenar_cliente_por_nome(struct pedido *p, struct pedido *P, int *A);
 
     void ordenar_pedido_por_preço(struct pedido *p, struct pedido *P, int *A);
+
+#endif
