@@ -268,7 +268,9 @@ void remover_pedido(struct pedido *p, int *A)
     void alterar_cliente(struct pedido *p, int *A)
     {
 
-        for(int i=0; i<d; i++)
+        int i;
+
+        for(i=0; i<d; i++)
         {
             if(*A==p[i].c.codigo)
             {
@@ -285,8 +287,20 @@ void remover_pedido(struct pedido *p, int *A)
                 printf("digite o telefone do cliente: ");
                 scanf("%d", &p[i].c.telefone);
                 getchar();
-            
-            break;    
+
+                break;
+
+            }
+        }
+
+        for(int j=i+1; j<d; j++)
+        {
+            if(*A==p[i].c.codigo)
+            {
+                strcpy(p[j].c.nome, p[i].c.nome);
+                p[j].c.codigo=p[i].c.codigo;
+                strcpy(p[j].c.endereço, p[i].c.endereço);
+                p[j].c.telefone=p[i].c.telefone;
             }
         }
             
