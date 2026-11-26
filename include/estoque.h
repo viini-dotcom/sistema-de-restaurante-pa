@@ -85,6 +85,9 @@ int 	ingrediente_adicionar(	const char * restrict nome,
 int 	ingrediente_remover(const unsigned codigo); //
 #define ingrediente_editar(secao, codigo, valor) __ingrediente_editar_##secao(codigo, valor)
 int  ingrediente_existe(const unsigned codigo);
+int ingrediente_checar_quantidade(const unsigned codigo, const float quantidade);
+
+
 
 int 	estoque_adicionar(const unsigned codigo, const unsigned quantidade); //
 int 	estoque_remover(const unsigned codigo, const unsigned quantidade); //

@@ -495,3 +495,14 @@ ingredientes_listar_faltando(ingrediente_t *restrict destino)
 
 	return dest_idx;
 }
+
+int
+ingrediente_checar_quantidade(const unsigned codigo, const float quantidade) 
+{
+	ingrediente_t *i = ingrediente_checar(codigo);
+	if(i == NULL) return INGREDIENTE_INEXISTENTE;
+
+	if(i->quantidade > quantidade) return true;
+
+	return false;
+}
