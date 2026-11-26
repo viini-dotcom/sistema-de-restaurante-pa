@@ -29,7 +29,7 @@ struct cliente
 
     void buscar_pedido_por_codigo(struct pedido *p, int *A);
 
-    void buscar_pedido_por_nome_do_cliente(struct pedido *p, char *busca);
+    void buscar_pedido_por_nome_do_cliente(struct pedido *p, char *busca, char *data);
 
     void ordenar_cliente_por_codigo(struct pedido *c, struct pedido *C, int *A);
 
