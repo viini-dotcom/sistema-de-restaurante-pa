@@ -356,7 +356,7 @@ void remover_cliente(struct cliente *c, int *A)
         }
     }
 
-    void buscar_por_codigo(struct pedido *p, int *A)
+    void buscar_pedido_por_codigo(struct pedido *p, int *A)
     {
         for(int i=0; i<d; i++)
         {
@@ -383,7 +383,7 @@ void remover_cliente(struct cliente *c, int *A)
         }
     }
 
-    void buscar_por_nome_do_cliente(struct pedido *p, char *busca)
+    void buscar_pedido_por_nome_do_cliente(struct pedido *p, char *busca)
     {
         for(int i=0; i<d; i++)
         {
@@ -475,4 +475,18 @@ void remover_cliente(struct cliente *c, int *A)
             }
         }
 
+    }
+
+    void buscar_cliente_por_nome(struct cliente *c, char *busca)
+    {
+        for(int i=0; i<k; i++)
+        {
+            if(strstr(c[i].nome, busca)!=NULL)
+            {
+                printf("código do cliente: %d\n", c[i].codigo);
+                printf("nome do cliente: %s\n", c[i].nome);
+                printf("endereço do cliente: %s\n", c[i].endereço);
+                printf("telefone do cliente: %d\n", c[i].telefone);
+            }
+        }
     }
