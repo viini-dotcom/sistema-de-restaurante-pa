@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int d=0;
+int d=0, k=0;
 
 
 struct cliente
@@ -24,21 +24,21 @@ struct cliente
         char status[13];
     };
 
-void remover_pedido(struct pedido *p, int *A)
+void remover_cliente(struct cliente *c, int *A)
     {
 
-        for(int i=0; i<d; i++)
+        for(int i=0; i<k; i++)
         {
-            if(*A==p[i].codigo)
+            if(*A==c[i].codigo)
             {
-                for(int j=i; j<d; j++)
+                for(int j=i; j<k; j++)
                 {
-                    p[j]=p[j+1];
+                    c[j]=c[j+1];
                 }
                 
-            d=d-1;
+            k=k-1;
             
-            p=(struct pedido *) realloc(p, d*sizeof(struct pedido));
+            c=(struct cliente *) realloc(c, k*sizeof(struct cliente));
             
             break;    
             }
@@ -48,9 +48,9 @@ void remover_pedido(struct pedido *p, int *A)
             
     }
 
-    void adicionar_cliente(struct pedido *p, receita_t *R, int *e)
+    void adicionar_pedido(struct pedido *p, struct cliente *c, receita_t *R, int *e)
     {
-        struct pedido *aux;
+        struct pedido *aux, *aux2;
 
         aux=(struct pedido *) realloc(p, (d+1)*sizeof(struct pedido));
         if(aux!=NULL)
@@ -179,6 +179,30 @@ void remover_pedido(struct pedido *p, int *A)
             printf("digite o telefone do cliente: ");
             scanf("%d", &p[d].c.telefone);
             getchar();
+
+            aux2=(struct cliente *) realloc(c, (k+1)*sizeof(struct cliente));
+                
+            if(aux!=NULL)
+            {
+                c=aux2;
+
+                strcpy(c[k].nome, p[d].c.nome);
+
+                c[k].codigo=p[d].c.codigo;
+                    
+                c[k].telefone=p[d].c.telefone;
+                    
+                strcpy(c[k].endereço, p[d].c.endereço);
+
+            }
+                
+            if("aux2!=NULL")
+            {
+                printf("ERRO: ESTOURO DE MEMÓRIA");
+                system("pause");
+            }
+
+            k=k+1;
         }
 
         printf("digite a quantidade de receitas solicitadas: ");
@@ -265,7 +289,7 @@ void remover_pedido(struct pedido *p, int *A)
         d=d+1;        
     }
 
-    void alterar_cliente(struct pedido *p, int *A)
+    void alterar_cliente(struct pedido *p, struct cliente *c, int *A)
     {
 
         int i;
@@ -301,6 +325,18 @@ void remover_pedido(struct pedido *p, int *A)
                 p[j].c.codigo=p[i].c.codigo;
                 strcpy(p[j].c.endereço, p[i].c.endereço);
                 p[j].c.telefone=p[i].c.telefone;
+            }
+        }
+
+
+        for(int j=i+1; j<k; j++)
+        {
+            if(*A==c[i].codigo)
+            {
+                strcpy(c[j].nome, p[i].c.nome);
+                c[j].codigo=p[i].c.codigo;
+                strcpy(c[j].endereço, p[i].c.endereço);
+                c[j].telefone=p[i].c.telefone;
             }
         }
             
@@ -343,7 +379,6 @@ void remover_pedido(struct pedido *p, int *A)
                 printf("valor do pedido: %f\n", p[i].valor);
                 printf("status do pedido: %s\n", p[i].status);
 
-                break;
             }
         }
     }
@@ -374,17 +409,17 @@ void remover_pedido(struct pedido *p, int *A)
         }
     }
 
-    void ordenar_cliente_por_codigo(struct pedido *p, struct pedido *P, int *A)
+    void ordenar_cliente_por_codigo(struct cliente *c, struct cliente *C, int *A)
     {
-        for(int i=0; i<d-1; i++)
+        for(int i=0; i<k-1; i++)
         {
-            for(int j=0; j<d-i-1; j++)
+            for(int j=0; j<k-i-1; j++)
             {
-                if(p[j].c.codigo>p[j+1].c.codigo)
+                if(c[j].codigo>c[j+1].codigo)
                 {
-                    *P=p[j];
-                    p[j]=p[j+1];
-                    p[j+1]=*P;
+                    *C=c[j];
+                    c[j]=c[j+1];
+                    c[j+1]=*C;
                 }
             }
         }
@@ -408,17 +443,17 @@ void remover_pedido(struct pedido *p, int *A)
 
     }
 
-    void ordenar_cliente_por_nome(struct pedido *p, struct pedido *P, int *A)
+    void ordenar_cliente_por_nome(struct cliente *c, struct cliente *C, int *A)
     {
-        for(int i=0; i<d-1; i++)
+        for(int i=0; i<k-1; i++)
         {
-            for(int j=0; j<d-i-1; j++)
+            for(int j=0; j<k-i-1; j++)
             {
-                if(strcmp(p[j].c.nome, p[j+1].c.nome)>0)
+                if(strcmp(c[j].nome, c[j+1].nome)>0)
                 {
-                    *P=p[j];
-                    p[j]=p[j+1];
-                    p[j+1]=*P;
+                    *C=c[j];
+                    c[j]=c[j+1];
+                    c[j+1]=*C;
                 }
             }
         }
