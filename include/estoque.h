@@ -71,7 +71,7 @@ int __ingrediente_editar_CUSTO_UNITARIO(const unsigned codigo, const float custo
 int estoque_iniciar(ingrediente_t *);
 void estoque_encerrar();
 
-#define ingredientes_procurar(dest, value, tipo) __ingredientes_procurar_##tipo(dest, value) //
+#define ingredientes_procurar(tipo, dest, value) __ingredientes_procurar_##tipo(dest, value) //
 int ingrediente_listar(ingrediente_t * restrict destino, const unsigned tamanho ,int valor, int ordem); //
 int ingredientes_listar_faltando(ingrediente_t * restrict destino);
 

@@ -240,6 +240,21 @@ remover(const unsigned codigo)
 	return SUCESSO;
 }
 
+static int
+listar_ingredientes(const unsigned rec_id, ingrediente_t * restrict dest)
+{
+	int idx = 0;
+
+	block_t *b = encontrar(rec_id);
+	if(b == NULL) return RECEITA_INVALIDA;
+	for(int i = 0; i < b->receita.ing_num; i++) {
+		if(b->receita.ing[i].ativo == false) continue;
+		dest[idx++] = *ingrediente_checar(b->receita.ing[i].codigo);
+	}
+
+	return idx;
+}
+
 static int 
 existe_ing(const unsigned cod_rec, const unsigned cod_ing) 
 {
@@ -563,4 +578,18 @@ receita_fazer(const unsigned int receita_codigo, const unsigned int quantidade) 
 	}
 
 	return SUCESSO;
+}
+
+int
+receita_disponiveis(receita_t * restrict dest) 
+{
+	int idx = 0;
+	
+	for(int i = 0; i < diff; i++) { 
+		if(receitas[i].ativo == false) continue;
+		if(receita_ingrediente_disponivel(receitas[i].receita.codigo, 1) != 0) continue;
+		dest[idx++] = receitas[i].receita;
+	}
+
+	return idx;
 }
