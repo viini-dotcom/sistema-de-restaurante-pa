@@ -502,7 +502,7 @@ ingrediente_checar_quantidade(const unsigned codigo, const float quantidade)
 	ingrediente_t *i = ingrediente_checar(codigo);
 	if(i == NULL) return INGREDIENTE_INEXISTENTE;
 
-	if(i->quantidade > quantidade) return true;
+	if(i->quantidade < quantidade) return false;
 
-	return false;
+	return true;
 }
