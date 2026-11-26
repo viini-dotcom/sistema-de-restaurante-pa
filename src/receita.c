@@ -240,21 +240,6 @@ remover(const unsigned codigo)
 	return SUCESSO;
 }
 
-static int
-listar_ingredientes(const unsigned rec_id, ingrediente_t * restrict dest)
-{
-	int idx = 0;
-
-	block_t *b = encontrar(rec_id);
-	if(b == NULL) return RECEITA_INVALIDA;
-	for(int i = 0; i < b->receita.ing_num; i++) {
-		if(b->receita.ing[i].ativo == false) continue;
-		dest[idx++] = *ingrediente_checar(b->receita.ing[i].codigo);
-	}
-
-	return idx;
-}
-
 static int 
 existe_ing(const unsigned cod_rec, const unsigned cod_ing) 
 {
