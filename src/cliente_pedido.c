@@ -29,7 +29,7 @@ void remover_pedido(struct pedido *p, int *A)
 
         for(int i=0; i<d; i++)
         {
-            if(*A==p[i].c.codigo)
+            if(*A==p[i].codigo)
             {
                 for(int j=i; j<d; j++)
                 {
