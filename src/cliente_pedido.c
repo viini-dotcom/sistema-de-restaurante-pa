@@ -360,7 +360,7 @@ void remover_cliente(struct cliente *c, int *A)
     {
         for(int i=0; i<d; i++)
         {
-            if(*A==p[i].c.codigo || *A==p[i].codigo)
+            if(*A==p[i].c.codigo)
             {
                 printf("código do pedido: %d\n", p[i].codigo);
                 printf("código do cliente: %d\n", p[i].c.codigo);
@@ -379,15 +379,17 @@ void remover_cliente(struct cliente *c, int *A)
                 printf("valor do pedido: %f\n", p[i].valor);
                 printf("status do pedido: %s\n", p[i].status);
 
+                break;
+
             }
         }
     }
 
-    void buscar_pedido_por_nome_do_cliente(struct pedido *p, char *busca)
+    void buscar_pedido_por_nome_do_cliente(struct pedido *p, char *busca, char *data)
     {
         for(int i=0; i<d; i++)
         {
-            if(strstr(p[i].c.nome, busca)!=NULL)
+            if(strstr(p[i].c.nome, busca)!=NULL && (p[i].data, data)!=NULL)
             {
                 printf("código do pedido: %d\n", p[i].codigo);
                 printf("código do cliente: %d\n", p[i].c.codigo);
@@ -405,6 +407,8 @@ void remover_cliente(struct cliente *c, int *A)
 
                 printf("valor do pedido: %f\n", p[i].valor);
                 printf("status do pedido: %s\n", p[i].status);
+
+                break;
             }
         }
     }
